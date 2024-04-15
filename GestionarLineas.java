@@ -285,32 +285,32 @@ private LineaTelefono lineaTelefono;
         return retorno;
     }
 
-    public TarifaTelefonica getTarifa() {
-        return tarifa;
+    public String getTarifa() {
+        return tarifa.toString();
     }
 
     public void setTarifa(TarifaTelefonica tarifa) {
         this.tarifa = tarifa;
     }
 
-    public JTextField getJtfNif() {
-        return jtfNif;
+    public String getJtfNif() {
+        return jtfNif.toString();
     }
 
     public void setJtfNif(JTextField jtfNif) {
         this.jtfNif = jtfNif;
     }
 
-    public JTextField getJtfNumeroTlf() {
-        return jtfNumeroTlf;
+    public String getJtfNumeroTlf() {
+        return jtfNumeroTlf.toString();
     }
 
     public void setJtfNumeroTlf(JTextField jtfNumeroTlf) {
         this.jtfNumeroTlf = jtfNumeroTlf;
     }
 
-    public JTextField getJtfTitular() {
-        return jtfTitular;
+    public String getJtfTitular() {
+        return jtfTitular.toString();
     }
 
     public void setJtfTitular(JTextField jtfTitular) {
