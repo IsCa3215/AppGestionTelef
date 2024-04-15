@@ -294,7 +294,7 @@ private LineaTelefono lineaTelefono;
     }
 
     public String getJtfNif() {
-        return jtfNif.toString();
+        return jtfNif.getText();
     }
 
     public void setJtfNif(JTextField jtfNif) {
@@ -302,7 +302,7 @@ private LineaTelefono lineaTelefono;
     }
 
     public String getJtfNumeroTlf() {
-        return jtfNumeroTlf.toString();
+        return jtfNumeroTlf.getText();
     }
 
     public void setJtfNumeroTlf(JTextField jtfNumeroTlf) {
@@ -310,7 +310,7 @@ private LineaTelefono lineaTelefono;
     }
 
     public String getJtfTitular() {
-        return jtfTitular.toString();
+        return jtfTitular.getText();
     }
 
     public void setJtfTitular(JTextField jtfTitular) {

@@ -131,10 +131,11 @@ public class GraphicalInterface extends javax.swing.JFrame {
         GestionarLineas gestionar = new GestionarLineas(this, true);
         gestionar.setVisible(true);
         if(gestionar.aceptado()){
-            String data[] = {gestionar.getJtfTitular(), gestionar.getJtfNif(), gestionar.getJtfNumeroTlf(), gestionar.getTarifa()};
+            gestionar.setVisible(false);
+            String data [] = {gestionar.getJtfTitular().toString(), gestionar.getJtfNif().toString(), gestionar.getJtfNumeroTlf().toString(), gestionar.getTarifa()};
             DefaultTableModel tblModel = (DefaultTableModel)jTable1.getModel();
             tblModel.addRow(data);
-            this.jTable1.updateUI();
+            jTable1.updateUI();
         }
         
     }//GEN-LAST:event_jMenuItem1ActionPerformed

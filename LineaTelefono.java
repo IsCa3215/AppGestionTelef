@@ -300,8 +300,8 @@ public class LineaTelefono {
     public String getNumeroTelefono() {
         return numeroTelefono;
     }
-    public TarifaTelefonica getTarifa() {
-        return tarifa;
+    public String getTarifa() {
+        return this.tarifa.toString();
     }
     public Llamada[] getLlamadas_arr() {
         return llamadas_arr;
