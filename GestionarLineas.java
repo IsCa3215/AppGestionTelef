@@ -11,12 +11,14 @@ import static com.mycompany.aplicaciongestiontelefonicav2.TipoTelefono.FIJO;
 import static com.mycompany.aplicaciongestiontelefonicav2.TipoTelefono.GRATUITO;
 import static com.mycompany.aplicaciongestiontelefonicav2.TipoTelefono.MOVIL;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 /**
  *
  * @author EDX
  */
 public class GestionarLineas extends javax.swing.JDialog {
+    private boolean aceptado = false;
 private TarifaTelefonica tarifa;
 private ModeloLineaTelefonica LineaTelefonica;
 private LineaTelefono lineaTelefono;
@@ -205,7 +207,7 @@ private LineaTelefono lineaTelefono;
            JOptionPane.showMessageDialog(rootPane, "Tu tipo de tlf es: "+comprobarNumeroTelefono(jtfNumeroTlf.getText()), "Correcto", JOptionPane.INFORMATION_MESSAGE);
        }
        this.lineaTelefono = new LineaTelefono(jtfTitular.getText(),jtfNif.getText(),jtfPasswd.getText(),Integer.parseInt(jtfLimiteGasto.getText()),jtfNumeroTlf.getText(), this.tarifa );
-        
+        this.aceptado = true;
     }//GEN-LAST:event_jbAceptarActionPerformed
 
     private void jbCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbCancelarActionPerformed
@@ -282,12 +284,48 @@ private LineaTelefono lineaTelefono;
         }
         return retorno;
     }
+
+    public TarifaTelefonica getTarifa() {
+        return tarifa;
+    }
+
+    public void setTarifa(TarifaTelefonica tarifa) {
+        this.tarifa = tarifa;
+    }
+
+    public JTextField getJtfNif() {
+        return jtfNif;
+    }
+
+    public void setJtfNif(JTextField jtfNif) {
+        this.jtfNif = jtfNif;
+    }
+
+    public JTextField getJtfNumeroTlf() {
+        return jtfNumeroTlf;
+    }
+
+    public void setJtfNumeroTlf(JTextField jtfNumeroTlf) {
+        this.jtfNumeroTlf = jtfNumeroTlf;
+    }
+
+    public JTextField getJtfTitular() {
+        return jtfTitular;
+    }
+
+    public void setJtfTitular(JTextField jtfTitular) {
+        this.jtfTitular = jtfTitular;
+    }
     
     public boolean verificarTitular(String titular){
         return titular.matches("^.{15,80}$");
     }
     public boolean verificarPasswd(String passwd){
         return passwd.matches("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+    }
+    
+    public boolean aceptado(){
+        return this.aceptado;
     }
     
     public boolean verificarNif(String NIF) {

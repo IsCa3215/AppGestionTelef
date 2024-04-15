@@ -14,6 +14,7 @@ public class ModeloLineaTelefonica extends AbstractListModel {
     private String numeroTelefono;
     private String nif;
     private String password;
+    
     private int limite;
     private static double coste = 0;
     private DateTimeFormatter formatear = DateTimeFormatter.ofPattern("MMM");

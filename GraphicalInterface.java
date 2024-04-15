@@ -110,6 +110,10 @@ public class GraphicalInterface extends javax.swing.JFrame {
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         GestionarLineas gestionar = new GestionarLineas(this, true);
         gestionar.setVisible(true);
+        if(gestionar.aceptado()){
+            jList1.add(gestionar.getJtfTitular());
+            this.jList1.updateUI();
+        }
         
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
