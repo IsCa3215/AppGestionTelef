@@ -1,22 +1,20 @@
 package com.mycompany.aplicaciongestiontelefonicav2;
 import java.lang.reflect.Array;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class LineaTelefono {
     private String titular;
-    private String numeroTelefono;
     private String nif;
-    private String password;
+    private String contraseña;
     private int limite;
-    private static double coste = 0;
-    private DateTimeFormatter formatear = DateTimeFormatter.ofPattern("MMM");
-    private LocalDate añoPermanencia = LocalDate.now();
-    private LocalDate mesPermanencia = LocalDate.now();
-    
-    private Llamada[] llamadas_arr = new Llamada[50];
-
+    private int mesPermanencia;
+    private int añoPermanencia;
+    private String numeroTelefono;
+    private ArrayList<Llamada> listaLlamadas;
     private TarifaTelefonica tarifa;
 
  
@@ -36,8 +34,7 @@ public class LineaTelefono {
      * @throws IllegalArgumentException Se lanza una excepción cuando uno de los parámetros no se han introducido correctamente
      */
 
-    public LineaTelefono(String titular, String nif, String password, int limite, String numeroTelefono,
-            TarifaTelefonica tarifa) {
+    public LineaTelefono(String titular, String nif, String password, int limite, String numeroTelefono, TarifaTelefonica tarifa) {
         // COMPROBACIONES
         if (!verificarTitular(titular)) {
             throw new IllegalArgumentException("\u001B[31m" + "No se han cumplido los requisitos del campo titular" + "\u001B[0m");
@@ -51,18 +48,19 @@ public class LineaTelefono {
         if (!verificarLimite(limite)) {
             throw new IllegalArgumentException("\u001B[31m" + "El limite de la tarifa no cumple." + "\u001B[0m");
         }
-        if (!verificarNumero(numeroTelefono)) {
+        if (!comprobarNumeroTelefono(numeroTelefono)) {
             throw new IllegalArgumentException("\u001B[31m" + "El número no es válido" + "\u001B[0m");
         }
         // FIN COMPROBACIONES
-        
         this.titular = titular;
-        this.nif = nif;
-        this.password = password;
+        this.nif = nif.toUpperCase();
+        this.contraseña = contraseña;
         this.limite = limite;
         this.numeroTelefono = numeroTelefono;
         this.tarifa = tarifa;
-        this.añoPermanencia = añoPermanencia.plusYears(2);   
+        this.mesPermanencia = LocalDateTime.now().getMonthValue();
+        this.añoPermanencia = LocalDateTime.now().getYear() + 2;
+        this.listaLlamadas = new ArrayList<>();
         
     }
     /**
@@ -70,23 +68,21 @@ public class LineaTelefono {
      * @see LineaTelefono(LineaTelefono lt) Constructor copia
      * @param lt (La línea a la que se le va a hacer la copia)
      */
-    public LineaTelefono(LineaTelefono lt) {
-        this.titular = lt.titular;
-        this.nif = lt.nif;
-        this.password = lt.password;
-        this.limite = lt.limite;
-        this.numeroTelefono = lt.numeroTelefono;
-        this.tarifa = lt.tarifa;
+  public LineaTelefono(LineaTelefono linea) {
+        this.titular = linea.titular;
+        this.nif = linea.nif;
+        this.contraseña = linea.contraseña;
+        this.limite = linea.limite;
+        this.numeroTelefono = linea.numeroTelefono;
+        this.tarifa = linea.tarifa;
+        this.mesPermanencia = linea.mesPermanencia;
+        this.añoPermanencia = linea.añoPermanencia;
+        this.listaLlamadas = new ArrayList<>(linea.listaLlamadas);
     }
 
     public int numeroLlamadas() {
-        int count = 0;
-        for (Llamada llamada : llamadas_arr) {
-            if (llamada != null) {
-                count++;
-            }
-        }
-        return count;
+        // Contar el número de llamadas realizadas...
+        return listaLlamadas.size();
     }
 
     /**
@@ -95,58 +91,62 @@ public class LineaTelefono {
      * @param destino  Teléfono al que se realiza la llamada
      * @return true or false si se ha podido realizar la llamada
      */
-    public boolean Llamar(double duracion, String destino) {
-        if (!verificarNumero(destino)) {
-            throw new IllegalArgumentException("\u001B[31m" + "El número introducido no es válido" + "\u001B[0m");
+      public boolean llamar(int duracion, String destino) {
+        // Validaciones y realización de llamada...
+        if (duracion <= 0 || !comprobarNumeroTelefono(destino)) {
+            throw new IllegalArgumentException("La llamada no se pudo realizar debido a datos incorrectos.");
         }
-        if (duracion <= 0) {
-            throw new IllegalArgumentException("\u001B[31m" + "La duración de la llamada no es válida" + "\u001B[0m");
+        if (gastado() + calcularCosteLlamada(tarifa, obtenerTipoTelefono(destino), duracion) > limite) {
+            return false;
         }
-        for (int i = 0; i < llamadas_arr.length; i++) {
-            if (llamadas_arr[i] == null) {
-                llamadas_arr[i] = new Llamada(duracion, destino);
-                break; 
-            }
-        }
-        comprobarNumeroTelefono(destino);
-
-        calcularCosteLlamada(tarifa, comprobarNumeroTelefono(this.numeroTelefono), 12);
-        // FUNCTION calcularCosteLlamada()
+        listaLlamadas.add(new Llamada(duracion, destino));
         return true;
     }
+public double gastado() {
+    // Cálculo del gasto total...
+    double totalGastado = 0.0;
+    for (Llamada llamada : listaLlamadas) {
+        totalGastado += (int) calcularCosteLlamada(tarifa, obtenerTipoTelefono(llamada.getDestino()), llamada.getDuracion());
+    }
+    return totalGastado;
+}
+
+
+
+
 
     // VERIFICACIONES
 
     @Override
     public String toString() {
-        return "___________________________________________"+"\n"
-        +"Nueva línea de teléfono:" +"\n"+"titular: " + titular +"\n"+ "numeroTelefono: " + numeroTelefono +"\n"+ "NIF: " + nif +"\n"
-                + "contraseña: " + password +"\n"+ "limite: " + limite + "\n"+"añoPermanencia: " + añoPermanencia +"\n"
-                + "mesPermanencia: " + mesPermanencia.format(formatear) +"\n"+ "tarifa: " + tarifa + "\n"+
-                "___________________________________________";
+        return "LineaTelefono{" +
+                "titular='" + titular + '\'' +
+                ", nif='" + nif + '\'' +
+                ", limite=" + limite +
+                ", numeroTelefono='" + numeroTelefono + '\'' +
+                ", tarifa=" + tarifa +
+                '}';
     }
 
 
 
-    public static TipoTelefono comprobarNumeroTelefono(String numero) {
-        TipoTelefono retorno = null;
-        if (numero.matches("[89][1-8][0-9]{7}")) {
-            retorno = TipoTelefono.FIJO;
-        } else if (numero.matches("[6][0-9]\\d{7}|[7][1234]\\d{7}")) {
-            retorno = TipoTelefono.MOVIL;
-        } else if (numero.matches("[89][0][0][0-9]{6}")){
-            retorno = TipoTelefono.GRATUITO;
-        } else if (numero.matches("112|[0][0-9]{2}")){
-            retorno = TipoTelefono.GRATUITO_ESPECIAL;
-        } else if (numero.matches("[8][0][367][0-9]{6}|[9][0][57][0-9]{6}")){
-            retorno = TipoTelefono.COSTE_ADICIONAL;
-        } else if (numero.matches("[9][0][12][0-9]{6}")) {
-            retorno = TipoTelefono.COSTE_COMPARTIDO;
+    public static TipoTelefono obtenerTipoTelefono(String numero) {
+        if (numero.startsWith("9") || numero.startsWith("8")) {
+            return TipoTelefono.FIJO;
+        } else if (numero.startsWith("6") || numero.startsWith("7")) {
+            return TipoTelefono.MOVIL;
+        } else if (numero.startsWith("800") || numero.startsWith("900")) {
+            return TipoTelefono.GRATUITO;
+        } else if (numero.startsWith("112") || numero.startsWith("0")) {
+            return TipoTelefono.GRATUITO_ESPECIAL;
+        } else if (numero.startsWith("803") || numero.startsWith("806") || numero.startsWith("807") ||
+                numero.startsWith("905") || numero.startsWith("907")) {
+            return TipoTelefono.COSTE_ADICIONAL;
+        } else if (numero.startsWith("901") || numero.startsWith("902")) {
+            return TipoTelefono.COSTE_COMPARTIDO;
+        } else {
+            throw new IllegalArgumentException("No es un número de teléfono válido");
         }
-        if (retorno == null) {
-            throw new IllegalArgumentException("El número no es válido");
-        }
-        return retorno;
     }
     /**
      * 
@@ -156,40 +156,23 @@ public class LineaTelefono {
      * @return Coste de la llamada
      */
 
-     public static double calcularCosteLlamada(TarifaTelefonica tarifa, TipoTelefono tipo, double duracion) {
-        double coste = 0;
-        switch (tipo) {
-            case FIJO:
-                if (tarifa == TarifaTelefonica.BASICA) {
-                    coste = 0.13 * duracion;
-                } else if (tarifa == TarifaTelefonica.NORMAL) {
-                    coste = 0.1 * duracion;
-                } else {
-                    coste = 0 * duracion;
-                }
+    private static double calcularCosteLlamada(TarifaTelefonica tarifa, TipoTelefono tipo, int duracion) {
+        // Cálculo del coste de una llamada...
+        double coste;
+        switch (tarifa) {
+            case BASICA:
+                coste = tipo == TipoTelefono.FIJO ? 0.13 : tipo == TipoTelefono.MOVIL ? 0.22 : 0;
                 break;
-            case MOVIL:
-                if (tarifa == TarifaTelefonica.BASICA) {
-                    coste = 0.22 * duracion;
-                } else if (tarifa == TarifaTelefonica.NORMAL) {
-                    coste = 0.2 * duracion;
-                } else {
-                    coste = 0 * duracion;
-                }
+            case NORMAL:
+                coste = tipo == TipoTelefono.FIJO ? 0.1 : tipo == TipoTelefono.MOVIL ? 0.2 : 0.05;
                 break;
-            case GRATUITO:
-                coste = 0;
-                break;
-            case COSTE_ADICIONAL:
-                coste = 0.30 * duracion;
-                break;
-            case COSTE_COMPARTIDO:
-                coste = 0.15 * duracion;
+            case PREMIUM:
+                coste = 0; // No hay coste para llamadas premium
                 break;
             default:
-                throw new IllegalArgumentException("Error en el cálculo del costo de la llamada");
+                throw new IllegalArgumentException("Tarifa telefónica no válida.");
         }
-        return coste;
+        return coste * duracion;
     }
         /**
      * @see verificarPasswd() verifica que la contraseña cumpla todos los requisitos
@@ -238,12 +221,14 @@ public class LineaTelefono {
      * Método para consultar las llamadas de la línea
      * @return String de Llamadas
      */
-    public String consultarLlamadas() {
+    public String llamadas(int numero) {
+        // Obtener información sobre las últimas llamadas...
+        if (numero <= 0 || numero > listaLlamadas.size()) {
+            throw new IllegalArgumentException("El número de llamadas a consultar no es válido.");
+        }
         StringBuilder llamadasInfo = new StringBuilder();
-        for (Llamada llamada : llamadas_arr) {
-            if (llamada != null) {
-                llamadasInfo.append(llamada.toString()).append("\n");
-            }
+        for (int i = Math.max(0, listaLlamadas.size() - numero); i < listaLlamadas.size(); i++) {
+            llamadasInfo.append(listaLlamadas.get(i).toString()).append("\n");
         }
         return llamadasInfo.toString();
     }
@@ -264,13 +249,9 @@ public class LineaTelefono {
     }
 
 
-    private boolean verificarNumero(String numero) {
-        // Añadir comprobación de número tlf
-        boolean verificar = false;
-        if (numero.charAt(0) == '9' || numero.charAt(0) == '8' || numero.charAt(0) == '6' || numero.charAt(0) == '7') {
-            verificar = true;
-        }
-        return verificar;
+    public static boolean comprobarNumeroTelefono(String numero) {
+        // Validación de número de teléfono...
+        return numero.matches("[689]\\d{8}");
     }
     // FIN VERIFICACIONES
 
@@ -287,30 +268,40 @@ public class LineaTelefono {
         return nif;
     }
 
-    public String getPassword() {
-        return password;
+    public String getContraseña() {
+        return contraseña;
     }
-    public LocalDate getAñoPermanencia() {
-        return añoPermanencia;
-    }
-    public LocalDate getMesPermanencia() {
+ public int getMesPermanencia() {
         return mesPermanencia;
+    }
+
+    public int getAñoPermanencia() {
+        return añoPermanencia;
     }
 
     public String getNumeroTelefono() {
         return numeroTelefono;
     }
-    public String getTarifa() {
-        return this.tarifa.toString();
+    public TarifaTelefonica getTarifa() {
+        return this.tarifa;
     }
-    public Llamada[] getLlamadas_arr() {
-        return llamadas_arr;
+    public TarifaTelefonica getTarifaa(){
+        return this.tarifa;
     }
+  //  public Llamada[] getLlamadas_arr() {
+   //     return llamadas_arr;
+    //}
     // Fin GETTERS
 
     // SETTERS
-    public void setPassword(String password) {
-        this.password = password;
+  public boolean setContraseña(String contraseña) {
+      boolean res = false;
+        if(verificarPasswd(contraseña)){
+             this.contraseña = contraseña;
+             res = true;
+        }
+       return res;
+        
     }
 
     public void setLimite(int limite) {
@@ -319,5 +310,14 @@ public class LineaTelefono {
 
     public void setTarifa(TarifaTelefonica tarifa) {
         this.tarifa = tarifa;
+    }
+    
+        @Override
+    public boolean equals(Object o) {
+        // Método equals...
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LineaTelefono that = (LineaTelefono) o;
+        return nif.equals(that.nif);
     }
 }

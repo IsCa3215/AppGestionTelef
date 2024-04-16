@@ -4,7 +4,6 @@
  */
 package com.mycompany.aplicaciongestiontelefonicav2;
 
-import com.mycompany.aplicaciongestiontelefonicav2.ModeloLineaTelefonica;
 import static com.mycompany.aplicaciongestiontelefonicav2.TipoTelefono.COSTE_ADICIONAL;
 import static com.mycompany.aplicaciongestiontelefonicav2.TipoTelefono.COSTE_COMPARTIDO;
 import static com.mycompany.aplicaciongestiontelefonicav2.TipoTelefono.FIJO;
@@ -18,9 +17,8 @@ import javax.swing.JTextField;
  * @author EDX
  */
 public class GestionarLineas extends javax.swing.JDialog {
-    private boolean aceptado = false;
+boolean aceptado = false;
 private TarifaTelefonica tarifa;
-private ModeloLineaTelefonica LineaTelefonica;
 private LineaTelefono lineaTelefono;
     /**
      * Creates new form GestionarUsuarios
@@ -198,20 +196,24 @@ private LineaTelefono lineaTelefono;
        } else if(!verificarNif(jtfNif.getText())){
            JOptionPane.showMessageDialog(rootPane, "No se ha introducido un NIF válido", "ERROR", JOptionPane.ERROR_MESSAGE);
        } else if (!verificarPasswd(jtfPasswd.getText())){
-           JOptionPane.showMessageDialog(rootPane, "No se ha introducido un NIF válido", "ERROR", JOptionPane.ERROR_MESSAGE);
+           JOptionPane.showMessageDialog(rootPane, "No se ha introducido una contraseña válida", "ERROR", JOptionPane.ERROR_MESSAGE);
        } else if(!verificarLimite(Integer.parseInt(jtfLimiteGasto.getText()))){
-            JOptionPane.showMessageDialog(rootPane, "No se ha introducido un NIF válido", "ERROR", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(rootPane, "El límite especificado no cumple con los requisitos", "ERROR", JOptionPane.ERROR_MESSAGE);
        }  else if(!verificarNumero(jtfNumeroTlf.getText())){
-             JOptionPane.showMessageDialog(rootPane, "No se ha introducido un NIF válido", "ERROR", JOptionPane.ERROR_MESSAGE);
+             JOptionPane.showMessageDialog(rootPane, "El número de teléfono no es válido", "ERROR", JOptionPane.ERROR_MESSAGE);
        } else {
+          
            JOptionPane.showMessageDialog(rootPane, "Tu tipo de tlf es: "+comprobarNumeroTelefono(jtfNumeroTlf.getText()), "Correcto", JOptionPane.INFORMATION_MESSAGE);
+                   this.aceptado = true;
+                    this.setVisible(false);
        }
-       this.lineaTelefono = new LineaTelefono(jtfTitular.getText(),jtfNif.getText(),jtfPasswd.getText(),Integer.parseInt(jtfLimiteGasto.getText()),jtfNumeroTlf.getText(), this.tarifa );
-        this.aceptado = true;
+      // this.lineaTelefono = new LineaTelefono(jtfTitular.getText(),jtfNif.getText(),jtfPasswd.getText(),Integer.parseInt(jtfLimiteGasto.getText()),jtfNumeroTlf.getText(), this.tarifa );
+
     }//GEN-LAST:event_jbAceptarActionPerformed
 
     private void jbCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbCancelarActionPerformed
-       
+       this.aceptado = false;
+       this.setVisible(false);
     }//GEN-LAST:event_jbCancelarActionPerformed
 
     private void jtfNifActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfNifActionPerformed
@@ -285,8 +287,8 @@ private LineaTelefono lineaTelefono;
         return retorno;
     }
 
-    public String getTarifa() {
-        return tarifa.toString();
+    public TarifaTelefonica getTarifa() {
+        return tarifa;
     }
 
     public void setTarifa(TarifaTelefonica tarifa) {
@@ -326,6 +328,14 @@ private LineaTelefono lineaTelefono;
     
     public boolean aceptado(){
         return this.aceptado;
+    }
+    
+    public String getPasswd(){
+        return jtfPasswd.getText();
+    }
+
+    public int getJtfLimiteGasto() {
+        return Integer.parseInt(jtfLimiteGasto.getText());
     }
     
     public boolean verificarNif(String NIF) {

@@ -4,6 +4,11 @@
  */
 package com.mycompany.aplicaciongestiontelefonicav2;
 
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.net.URL;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -11,14 +16,18 @@ import javax.swing.table.DefaultTableModel;
  * @author EDX
  */
 public class GraphicalInterface extends javax.swing.JFrame {
-    ModeloLineaTelefonica modeloLineaTelefonica;
+
+    DefaultTableModel tblModel;
+    GestionarLineas gestionar = new GestionarLineas(this, true);
+    
+    private ArrayList<LineaTelefono> lineasTelefonicas = new ArrayList<>();
+
     /**
      * Creates new form GraphicalInterface
      */
     public GraphicalInterface() {
         initComponents();
-        this.modeloLineaTelefonica = new ModeloLineaTelefonica();
-        this.jList1.setModel(modeloLineaTelefonica);
+        tblModel = (DefaultTableModel) jTable1.getModel();
     }
 
     /**
@@ -33,17 +42,22 @@ public class GraphicalInterface extends javax.swing.JFrame {
         jMenuBar2 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         jmArchivo = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
-        jMenu3 = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
         jmEditar = new javax.swing.JMenu();
         jMenu4 = new javax.swing.JMenu();
+        jmiMostrarNumero = new javax.swing.JMenuItem();
+        jmiMostarNombreTitular = new javax.swing.JMenuItem();
+        jmiMostrarFechaPermanencia = new javax.swing.JMenuItem();
+        jmiModificarContraseña = new javax.swing.JMenuItem();
+        jmiRealizarLlamada = new javax.swing.JMenuItem();
+        jmiConsultarLlamadas = new javax.swing.JMenuItem();
+        jmiConsultarGastoTotal = new javax.swing.JMenuItem();
         jmAyuda = new javax.swing.JMenu();
 
         jMenu1.setText("File");
@@ -55,8 +69,6 @@ public class GraphicalInterface extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Gestión Telefónica V2");
 
-        jScrollPane1.setViewportView(jList1);
-
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel1.setText("Lista de líneas telefónicas");
 
@@ -67,7 +79,15 @@ public class GraphicalInterface extends javax.swing.JFrame {
             new String [] {
                 "Nombre", "DNI", "Numero tlf", "Tarifa"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane2.setViewportView(jTable1);
 
         jmArchivo.setText("Archivo");
@@ -80,14 +100,76 @@ public class GraphicalInterface extends javax.swing.JFrame {
         });
         jmArchivo.add(jMenuItem1);
 
-        jMenu3.setText("Eliminar usuario");
-        jmArchivo.add(jMenu3);
+        jMenuItem2.setText("Eliminar Usuario");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jmArchivo.add(jMenuItem2);
 
         jMenuBar1.add(jmArchivo);
 
         jmEditar.setText("Editar");
 
         jMenu4.setText("Modificar usuario");
+
+        jmiMostrarNumero.setText("Mostrar Numero Teléfono");
+        jmiMostrarNumero.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmiMostrarNumeroActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jmiMostrarNumero);
+
+        jmiMostarNombreTitular.setText("Mostrar nombre del titular");
+        jmiMostarNombreTitular.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmiMostarNombreTitularActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jmiMostarNombreTitular);
+
+        jmiMostrarFechaPermanencia.setText("Mostrar fecha de permanencia");
+        jmiMostrarFechaPermanencia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmiMostrarFechaPermanenciaActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jmiMostrarFechaPermanencia);
+
+        jmiModificarContraseña.setText("Modificar contraseña");
+        jmiModificarContraseña.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmiModificarContraseñaActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jmiModificarContraseña);
+
+        jmiRealizarLlamada.setText("Realizar una llamada");
+        jmiRealizarLlamada.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmiRealizarLlamadaActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jmiRealizarLlamada);
+
+        jmiConsultarLlamadas.setText("Consultar llamadas");
+        jmiConsultarLlamadas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmiConsultarLlamadasActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jmiConsultarLlamadas);
+
+        jmiConsultarGastoTotal.setText("Consultar gasto total");
+        jmiConsultarGastoTotal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmiConsultarGastoTotalActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jmiConsultarGastoTotal);
+
         jmEditar.add(jMenu4);
 
         jMenuBar1.add(jmEditar);
@@ -102,14 +184,13 @@ public class GraphicalInterface extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 474, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(53, 53, 53)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)))
+                        .addContainerGap()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 800, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 784, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -118,27 +199,102 @@ public class GraphicalInterface extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(15, 15, 15))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(14, 14, 14))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        GestionarLineas gestionar = new GestionarLineas(this, true);
+
         gestionar.setVisible(true);
-        if(gestionar.aceptado()){
+        if (gestionar.aceptado()) {
             gestionar.setVisible(false);
-            String data [] = {gestionar.getJtfTitular().toString(), gestionar.getJtfNif().toString(), gestionar.getJtfNumeroTlf().toString(), gestionar.getTarifa()};
-            DefaultTableModel tblModel = (DefaultTableModel)jTable1.getModel();
+            String nombre = gestionar.getJtfTitular();
+            String dni = gestionar.getJtfNif();
+            String numero = gestionar.getJtfNumeroTlf();
+            TarifaTelefonica tarifa = gestionar.getTarifa();
+            String contraseña = gestionar.getPasswd();
+            int limite = gestionar.getJtfLimiteGasto();
+            String data[] = {nombre, dni, numero, tarifa.toString()};
+            LineaTelefono Linea = new LineaTelefono(nombre, dni, contraseña, limite, numero, tarifa);
+            lineasTelefonicas.add(Linea);
             tblModel.addRow(data);
             jTable1.updateUI();
         }
-        
+
     }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        tblModel.removeRow(jTable1.getSelectedRow());
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jmiMostrarNumeroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiMostrarNumeroActionPerformed
+        int filaSeleccionada = jTable1.getSelectedRow();
+        if (filaSeleccionada != -1 && !lineasTelefonicas.isEmpty()) {
+            // Obtiene el modelo de la tabla
+            LineaTelefono linea = lineasTelefonicas.get(filaSeleccionada);
+            String numero = linea.getNumeroTelefono();
+            JOptionPane.showMessageDialog(this, "El número de teléfono es: " + numero, "Número de Teléfono", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Por favor, selecciona una línea telefónica.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jmiMostrarNumeroActionPerformed
+
+    private void jmiMostarNombreTitularActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiMostarNombreTitularActionPerformed
+        int filaSeleccionada = jTable1.getSelectedRow();
+        if (filaSeleccionada != -1 && !lineasTelefonicas.isEmpty()) {
+           LineaTelefono linea = lineasTelefonicas.get(filaSeleccionada);
+            String nombre = linea.getTitular();
+            JOptionPane.showMessageDialog(rootPane, "El titular de la línea es: " + nombre, "Titular de la línea:", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Por favor, selecciona una línea telefónica.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jmiMostarNombreTitularActionPerformed
+
+    private void jmiMostrarFechaPermanenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiMostrarFechaPermanenciaActionPerformed
+        int filaSeleccionada = jTable1.getSelectedRow();
+        if (filaSeleccionada != -1 && !lineasTelefonicas.isEmpty()) {
+            LineaTelefono linea = lineasTelefonicas.get(filaSeleccionada);
+            int permanencia = linea.getAñoPermanencia();
+            JOptionPane.showMessageDialog(rootPane, "Su fecha de permanencia es de: " + permanencia, "Permanencia", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Por favor, selecciona una línea telefónica.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jmiMostrarFechaPermanenciaActionPerformed
+
+    private void jmiModificarContraseñaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiModificarContraseñaActionPerformed
+        int filaSeleccionada = jTable1.getSelectedRow();
+        ModificarDialog modificar = new ModificarDialog(this, true, 1);
+        if(filaSeleccionada != -1 && !lineasTelefonicas.isEmpty()){
+            LineaTelefono linea = lineasTelefonicas.get(filaSeleccionada);
+            modificar.setVisible(true);
+            if(linea.setContraseña(modificar.getjTextField1()) && modificar.getAceptar()){
+                JOptionPane.showMessageDialog(rootPane, "La contraseña se ha modificado correctamente"+linea.getContraseña(), "Modificar Contraseña", JOptionPane.OK_OPTION);
+            } else if(!modificar.getAceptar()){
+               JOptionPane.showMessageDialog(this, "Se ha cancelado la operación", "Error", JOptionPane.ERROR_MESSAGE);
+               modificar.setVisible(false);
+            } else{
+                JOptionPane.showMessageDialog(this, "La contraseña no cumple los requisitos", "Error", JOptionPane.ERROR_MESSAGE);
+                modificar.setVisible(true);
+            }  
+            } else {
+            JOptionPane.showMessageDialog(this, "Por favor, selecciona una línea telefónica.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jmiModificarContraseñaActionPerformed
+
+    private void jmiRealizarLlamadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiRealizarLlamadaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jmiRealizarLlamadaActionPerformed
+
+    private void jmiConsultarLlamadasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiConsultarLlamadasActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jmiConsultarLlamadasActionPerformed
+
+    private void jmiConsultarGastoTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiConsultarGastoTotalActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jmiConsultarGastoTotalActionPerformed
 
     /**
      * @param args the command line arguments
@@ -174,22 +330,32 @@ public class GraphicalInterface extends javax.swing.JFrame {
             }
         });
     }
+    
+    
+    
+    
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JList<String> jList1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable1;
     private javax.swing.JMenu jmArchivo;
     private javax.swing.JMenu jmAyuda;
     private javax.swing.JMenu jmEditar;
+    private javax.swing.JMenuItem jmiConsultarGastoTotal;
+    private javax.swing.JMenuItem jmiConsultarLlamadas;
+    private javax.swing.JMenuItem jmiModificarContraseña;
+    private javax.swing.JMenuItem jmiMostarNombreTitular;
+    private javax.swing.JMenuItem jmiMostrarFechaPermanencia;
+    private javax.swing.JMenuItem jmiMostrarNumero;
+    private javax.swing.JMenuItem jmiRealizarLlamada;
     // End of variables declaration//GEN-END:variables
 }
