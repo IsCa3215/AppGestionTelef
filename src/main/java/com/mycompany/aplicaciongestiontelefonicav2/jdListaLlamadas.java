@@ -4,20 +4,41 @@
  */
 package com.mycompany.aplicaciongestiontelefonicav2;
 
+import com.mycompany.aplicaciongestiontelefonicav2.Llamada;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author EDX
  */
-public class RealizarLlamada extends javax.swing.JDialog {
-
+public class jdListaLlamadas extends javax.swing.JDialog {
+    DefaultTableModel tblModel;
+    private ArrayList<Llamada> listaLlamadas = new ArrayList<>();
     /**
-     * Creates new form RealizarLlamada
+     * Creates new form jdListaLlamadas
      */
-    public RealizarLlamada(java.awt.Frame parent, boolean modal) {
+    public jdListaLlamadas(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        tblModel = (DefaultTableModel) jTable1.getModel();
     }
-
+    public jdListaLlamadas(java.awt.Frame parent, boolean modal, LineaTelefono linea){
+        this(parent, modal);
+               listaLlamadas.addAll(linea.getArrLlamadas());
+                for (Llamada llamada : listaLlamadas) {
+                    String destino = llamada.getDestino();
+                    String duracion = String.valueOf(llamada.getDuracion());
+                    LocalDateTime fecha = llamada.getFecha();
+                     String data[] = {duracion,destino, fecha.toString()};
+                     tblModel.addRow(data);
+                     jTable1.updateUI();
+                }
+                }
+    
+                
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -27,17 +48,36 @@ public class RealizarLlamada extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Duración", "Destino", "Fecha"
+            }
+        ));
+        jScrollPane1.setViewportView(jTable1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -60,20 +100,20 @@ public class RealizarLlamada extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(RealizarLlamada.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(jdListaLlamadas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(RealizarLlamada.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(jdListaLlamadas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(RealizarLlamada.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(jdListaLlamadas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(RealizarLlamada.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(jdListaLlamadas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                RealizarLlamada dialog = new RealizarLlamada(new javax.swing.JFrame(), true);
+                jdListaLlamadas dialog = new jdListaLlamadas(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -86,5 +126,7 @@ public class RealizarLlamada extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 }

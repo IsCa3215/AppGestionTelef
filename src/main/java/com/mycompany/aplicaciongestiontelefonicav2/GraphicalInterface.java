@@ -6,9 +6,22 @@ package com.mycompany.aplicaciongestiontelefonicav2;
 
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import static java.lang.String.valueOf;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -19,7 +32,7 @@ public class GraphicalInterface extends javax.swing.JFrame {
 
     DefaultTableModel tblModel;
     GestionarLineas gestionar = new GestionarLineas(this, true);
-    
+
     private ArrayList<LineaTelefono> lineasTelefonicas = new ArrayList<>();
 
     /**
@@ -58,6 +71,9 @@ public class GraphicalInterface extends javax.swing.JFrame {
         jmiRealizarLlamada = new javax.swing.JMenuItem();
         jmiConsultarLlamadas = new javax.swing.JMenuItem();
         jmiConsultarGastoTotal = new javax.swing.JMenuItem();
+        jMenu3 = new javax.swing.JMenu();
+        jbAñadirArchivo = new javax.swing.JMenuItem();
+        jmExportarLinea = new javax.swing.JMenuItem();
         jmAyuda = new javax.swing.JMenu();
 
         jMenu1.setText("File");
@@ -90,6 +106,7 @@ public class GraphicalInterface extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(jTable1);
 
+        jmArchivo.setBackground(new java.awt.Color(0, 102, 0));
         jmArchivo.setText("Archivo");
 
         jMenuItem1.setText("Añadir usuario");
@@ -174,6 +191,26 @@ public class GraphicalInterface extends javax.swing.JFrame {
 
         jMenuBar1.add(jmEditar);
 
+        jMenu3.setText("Añadir");
+
+        jbAñadirArchivo.setText("Añadir archivo");
+        jbAñadirArchivo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbAñadirArchivoActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jbAñadirArchivo);
+
+        jmExportarLinea.setText("Exportar Línea");
+        jmExportarLinea.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmExportarLineaActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jmExportarLinea);
+
+        jMenuBar1.add(jMenu3);
+
         jmAyuda.setText("Ayuda");
         jMenuBar1.add(jmAyuda);
 
@@ -245,7 +282,7 @@ public class GraphicalInterface extends javax.swing.JFrame {
     private void jmiMostarNombreTitularActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiMostarNombreTitularActionPerformed
         int filaSeleccionada = jTable1.getSelectedRow();
         if (filaSeleccionada != -1 && !lineasTelefonicas.isEmpty()) {
-           LineaTelefono linea = lineasTelefonicas.get(filaSeleccionada);
+            LineaTelefono linea = lineasTelefonicas.get(filaSeleccionada);
             String nombre = linea.getTitular();
             JOptionPane.showMessageDialog(rootPane, "El titular de la línea es: " + nombre, "Titular de la línea:", JOptionPane.INFORMATION_MESSAGE);
         } else {
@@ -267,34 +304,219 @@ public class GraphicalInterface extends javax.swing.JFrame {
     private void jmiModificarContraseñaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiModificarContraseñaActionPerformed
         int filaSeleccionada = jTable1.getSelectedRow();
         ModificarDialog modificar = new ModificarDialog(this, true, 1);
-        if(filaSeleccionada != -1 && !lineasTelefonicas.isEmpty()){
+        if (filaSeleccionada != -1 && !lineasTelefonicas.isEmpty()) {
             LineaTelefono linea = lineasTelefonicas.get(filaSeleccionada);
             modificar.setVisible(true);
-            if(linea.setContraseña(modificar.getjTextField1()) && modificar.getAceptar()){
-                JOptionPane.showMessageDialog(rootPane, "La contraseña se ha modificado correctamente"+linea.getContraseña(), "Modificar Contraseña", JOptionPane.OK_OPTION);
-            } else if(!modificar.getAceptar()){
-               JOptionPane.showMessageDialog(this, "Se ha cancelado la operación", "Error", JOptionPane.ERROR_MESSAGE);
-               modificar.setVisible(false);
-            } else{
+            if (linea.setContraseña(modificar.getjTextField1()) && modificar.getAceptar()) {
+                JOptionPane.showMessageDialog(rootPane, "La contraseña se ha modificado correctamente" + linea.getContraseña(), "Modificar Contraseña", JOptionPane.INFORMATION_MESSAGE);
+            } else if (!modificar.getAceptar()) {
+                JOptionPane.showMessageDialog(this, "Se ha cancelado la operación", "Error", JOptionPane.ERROR_MESSAGE);
+                modificar.setVisible(false);
+            } else {
                 JOptionPane.showMessageDialog(this, "La contraseña no cumple los requisitos", "Error", JOptionPane.ERROR_MESSAGE);
                 modificar.setVisible(true);
-            }  
-            } else {
+            }
+        } else {
             JOptionPane.showMessageDialog(this, "Por favor, selecciona una línea telefónica.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jmiModificarContraseñaActionPerformed
 
     private void jmiRealizarLlamadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiRealizarLlamadaActionPerformed
-        // TODO add your handling code here:
+        RealizarLlamada llamadinha = new RealizarLlamada(this, true);
+        llamadinha.setVisible(true);
+        if (llamadinha.getAceptado()) {
+            int filaSeleccionada = jTable1.getSelectedRow();
+            if (filaSeleccionada != -1 && !lineasTelefonicas.isEmpty()) {
+                LineaTelefono linea = lineasTelefonicas.get(filaSeleccionada);
+
+                if (linea.llamar(Integer.parseInt(llamadinha.getjTextField2()), llamadinha.getjTextField1())) {
+                    JOptionPane.showMessageDialog(rootPane, "La llamada se ha realizado correctamente a: " + llamadinha.getjTextField1(), "Llamada realizada", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(rootPane, "El coste de la llamada supera el limite de gasto de la tarifa " + linea.getLimite(), "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Por favor, selecciona una línea telefónica.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }//GEN-LAST:event_jmiRealizarLlamadaActionPerformed
 
     private void jmiConsultarLlamadasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiConsultarLlamadasActionPerformed
-        // TODO add your handling code here:
+
+        int filaSeleccionada = jTable1.getSelectedRow();
+        if (filaSeleccionada != -1 && !lineasTelefonicas.isEmpty()) {
+            LineaTelefono linea = lineasTelefonicas.get(filaSeleccionada);
+
+            jdListaLlamadas listaLlamadas = new jdListaLlamadas(this, true, linea);
+            listaLlamadas.setVisible(true);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Por favor, selecciona una línea telefónica.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
     }//GEN-LAST:event_jmiConsultarLlamadasActionPerformed
 
     private void jmiConsultarGastoTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiConsultarGastoTotalActionPerformed
-        // TODO add your handling code here:
+        int filaSeleccionada = jTable1.getSelectedRow();
+        if (filaSeleccionada != -1 && !lineasTelefonicas.isEmpty()) {
+            LineaTelefono linea = lineasTelefonicas.get(filaSeleccionada);
+            JOptionPane.showMessageDialog(this, "Has gastado en la línea un total de: " + linea.gastado(), "Total gastado", JOptionPane.INFORMATION_MESSAGE);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Por favor, selecciona una línea telefónica.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_jmiConsultarGastoTotalActionPerformed
+
+    private void jbAñadirArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbAñadirArchivoActionPerformed
+        JFileChooser selector = new JFileChooser();
+        FileNameExtensionFilter filtro = new FileNameExtensionFilter("TEXT FILES", "txt", "text", "xml");
+        selector.addChoosableFileFilter(filtro);
+        String line = null;
+        ArrayList<LineaTelefono> valores = new ArrayList<>();
+        int seleccion = selector.showOpenDialog(null);
+        if (seleccion == JFileChooser.APPROVE_OPTION) {
+            File seleccionField = selector.getSelectedFile();
+            String path = seleccionField.getAbsolutePath();
+            try {
+                String nombre = null;
+                String nif = null;
+                String numero = null;
+                String contraseña = null;
+                int limite = 0;
+                int mes = 0;
+                int año = 0;
+                TarifaTelefonica tarifa = null;
+                int llamadas = 0;
+                boolean dentroTelef = false;
+
+                FileReader fs = new FileReader(path);
+                BufferedReader bs = new BufferedReader(fs);
+                while ((line = bs.readLine()) != null) {
+                    if (line.startsWith("[phonelist")) {
+                        dentroTelef = false;
+                    } else if (line.startsWith("[Llamada")) {
+                        dentroTelef = false;
+                    } else if (line.startsWith("[phone")) {
+                        dentroTelef = true;
+                        nombre = null;
+                        nif = null;
+                        numero = null;
+                        contraseña = null;
+                        limite = 0;
+                        mes = 0;
+                        año = 0;
+                        tarifa = null;
+                        llamadas = 0;
+                    } else if (dentroTelef) {
+                        if (line.startsWith("nombre=")) {
+                            nombre = line.substring(7);
+                        } else if (line.startsWith("nif=")) {
+                            nif = line.substring(4);
+                        } else if (line.startsWith("numero=")) {
+                            numero = line.substring(7);
+                        } else if (line.startsWith("contraseña=")) {
+                            contraseña = line.substring(11);
+                        } else if (line.startsWith("limite=")) {
+                            limite = Integer.parseInt(line.substring(7));
+                        } else if (line.startsWith("mes=")) {
+                            mes = Integer.parseInt(line.substring(4));
+                        } else if (line.startsWith("año=")) {
+                            año = Integer.parseInt(line.substring(4));
+                        } else if (line.startsWith("tarifa=")) {
+                            switch (line.substring(7)) {
+                                case "BASICA":
+                                    tarifa = TarifaTelefonica.BASICA;
+                                    break;
+                                case "NORMAL":
+                                    tarifa = TarifaTelefonica.NORMAL;
+                                    break;
+                                case "PREMIUM":
+                                    tarifa = TarifaTelefonica.PREMIUM;
+                            }
+                        } else if (line.startsWith("llamadas=")) {
+                            Integer.parseInt(line.substring(9));
+                        }
+                    }
+                    if (nombre != null && nif != null && numero != null && contraseña != null && limite != 0 && mes != 0 && año != 0 && tarifa != null) {
+                        LineaTelefono linea = new LineaTelefono(nombre, nif, contraseña, limite, numero, tarifa);
+                        lineasTelefonicas.add(linea);
+                        
+                        nombre = null;
+                        nif = null;
+                        numero = null;
+                        contraseña = null;
+                        limite = 0;
+                        mes = 0;
+                        año = 0;
+                        tarifa = null;
+                        llamadas = 0;
+                    }
+                }
+                System.out.println(lineasTelefonicas.size());
+                for (LineaTelefono linea : lineasTelefonicas) {
+                    String data[] = {linea.getTitular(), linea.getNif(), linea.getNumeroTelefono(), linea.getTarifa().toString()};
+                    tblModel.addRow(data);
+                }
+                jTable1.updateUI();
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(GraphicalInterface.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(GraphicalInterface.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+    }//GEN-LAST:event_jbAñadirArchivoActionPerformed
+
+    private void jmExportarLineaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmExportarLineaActionPerformed
+        File file = new File("LineasTelefonicas.txt");
+        System.out.println(file.getAbsolutePath());
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException ex) {
+                Logger.getLogger(GraphicalInterface.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        PrintWriter salida = null;
+        BufferedWriter buffer = null;
+        String linea;
+        int i = 0;
+        try {
+            buffer = new BufferedWriter(new FileWriter(file, true));
+            salida = new PrintWriter(buffer);
+            salida.println("[phonelist" + lineasTelefonicas.size() + "]");
+            for (LineaTelefono lineas : lineasTelefonicas) {
+
+                salida.println("[phone" + i + "]");
+                i++;
+
+                salida.println("nombre=" + lineas.getTitular());
+                salida.println("nif=" + lineas.getNif());
+                salida.println("numero=" + lineas.getNumeroTelefono());
+                salida.println("contraseña=" + lineas.getContraseña());
+                salida.println("limite=" + lineas.getLimite());
+                salida.println("mes=" + lineas.getMesPermanencia());
+                salida.println("año=" + lineas.getAñoPermanencia());
+                salida.println("tarifa=" + lineas.getTarifa());
+                salida.println("llamadas=" + valueOf(lineas.getArrLlamadas().size()));
+                ArrayList<Llamada> arrLlamadas = lineas.getArrLlamadas();
+                salida.println("[Llamada" + arrLlamadas.size() + "]");
+                for (Llamada llamadas : arrLlamadas) {
+                    for (int e = 1; e < arrLlamadas.size(); e++) {
+                        salida.println("[Llamada" + e + "]");
+                    }
+                    salida.println((char) llamadas.getDuracion());
+                    salida.println(llamadas.getDestino());
+                    salida.println(llamadas.getFecha());
+                }
+
+            }
+            salida.flush();
+            salida.close();
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalInterface.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_jmExportarLineaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -330,16 +552,13 @@ public class GraphicalInterface extends javax.swing.JFrame {
             }
         });
     }
-    
-    
-    
-    
-    
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuBar jMenuBar2;
@@ -347,9 +566,11 @@ public class GraphicalInterface extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable1;
+    private javax.swing.JMenuItem jbAñadirArchivo;
     private javax.swing.JMenu jmArchivo;
     private javax.swing.JMenu jmAyuda;
     private javax.swing.JMenu jmEditar;
+    private javax.swing.JMenuItem jmExportarLinea;
     private javax.swing.JMenuItem jmiConsultarGastoTotal;
     private javax.swing.JMenuItem jmiConsultarLlamadas;
     private javax.swing.JMenuItem jmiModificarContraseña;

@@ -36,21 +36,6 @@ public class LineaTelefono {
 
     public LineaTelefono(String titular, String nif, String password, int limite, String numeroTelefono, TarifaTelefonica tarifa) {
         // COMPROBACIONES
-        if (!verificarTitular(titular)) {
-            throw new IllegalArgumentException("\u001B[31m" + "No se han cumplido los requisitos del campo titular" + "\u001B[0m");
-        }
-        if (!verificarNif(nif)) {
-            throw new IllegalArgumentException("\u001B[31m" + "No se ha introducido un NIF válido" + "\u001B[0m");
-        }
-        if (!verificarPasswd(password)) {
-            throw new IllegalArgumentException("\u001B[31m" + "La contraseña no cumple los requisitos del campo" + "\u001B[0m");
-        }
-        if (!verificarLimite(limite)) {
-            throw new IllegalArgumentException("\u001B[31m" + "El limite de la tarifa no cumple." + "\u001B[0m");
-        }
-        if (!comprobarNumeroTelefono(numeroTelefono)) {
-            throw new IllegalArgumentException("\u001B[31m" + "El número no es válido" + "\u001B[0m");
-        }
         // FIN COMPROBACIONES
         this.titular = titular;
         this.nif = nif.toUpperCase();
@@ -94,7 +79,7 @@ public class LineaTelefono {
       public boolean llamar(int duracion, String destino) {
         // Validaciones y realización de llamada...
         if (duracion <= 0 || !comprobarNumeroTelefono(destino)) {
-            throw new IllegalArgumentException("La llamada no se pudo realizar debido a datos incorrectos.");
+            return false;
         }
         if (gastado() + calcularCosteLlamada(tarifa, obtenerTipoTelefono(destino), duracion) > limite) {
             return false;
@@ -224,7 +209,7 @@ public double gastado() {
     public String llamadas(int numero) {
         // Obtener información sobre las últimas llamadas...
         if (numero <= 0 || numero > listaLlamadas.size()) {
-            throw new IllegalArgumentException("El número de llamadas a consultar no es válido.");
+            return null;
         }
         StringBuilder llamadasInfo = new StringBuilder();
         for (int i = Math.max(0, listaLlamadas.size() - numero); i < listaLlamadas.size(); i++) {
@@ -254,7 +239,9 @@ public double gastado() {
         return numero.matches("[689]\\d{8}");
     }
     // FIN VERIFICACIONES
-
+    public ArrayList<Llamada> getArrLlamadas(){
+        return listaLlamadas;
+    }
     // GETTERS
     public String getTitular() {
         return titular;
@@ -288,9 +275,7 @@ public double gastado() {
     public TarifaTelefonica getTarifaa(){
         return this.tarifa;
     }
-  //  public Llamada[] getLlamadas_arr() {
-   //     return llamadas_arr;
-    //}
+   
     // Fin GETTERS
 
     // SETTERS
@@ -310,6 +295,14 @@ public double gastado() {
 
     public void setTarifa(TarifaTelefonica tarifa) {
         this.tarifa = tarifa;
+    }
+
+    public void setMesPermanencia(int mesPermanencia) {
+        this.mesPermanencia = mesPermanencia;
+    }
+
+    public void setAñoPermanencia(int añoPermanencia) {
+        this.añoPermanencia = añoPermanencia;
     }
     
         @Override
